@@ -3,7 +3,7 @@
 
 // import Identity from '../../models/Identity';
 // import genToken from '../../utils/genToken';
-import { registerUser, loginUser } from "../../services/AuthService";
+import { registerUser, loginUser } from "../../services/AuthService.js";
 
 
 const postUserRegister = async (req, res) => {
@@ -24,8 +24,8 @@ const postUserLogin = async (req, res) => {
         return res.status(200).json({message: "Successfully signed in"});
 
     } catch(error) {
-        console.log(error);
-        return res.status(500).json({message: e})
+        console.log("Error caught: \n", error);
+        return res.status(500).json({message: error})
     }
 }
 

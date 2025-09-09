@@ -4,7 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 
-import AuthRouter from './src/api/routers/AuthRouter';
+import AuthRouter from './src/api/routers/AuthRouter.js';
 
 const app = express();
 
