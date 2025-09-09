@@ -1,0 +1,31 @@
+{
+  "name": "fa-auth",
+  "version": "1.0.0",
+  "description": "The Auth Service for the forum app",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forum-app-team/fa-auth.git"
+  },
+  "author": "Paul Zhang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/forum-app-team/fa-auth/issues"
+  },
+  "homepage": "https://github.com/forum-app-team/fa-auth#readme",
+  "dependencies": {
+    "argon2": "^0.44.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.1"
+  }
+}
