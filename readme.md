@@ -13,6 +13,31 @@ A authentication microservice built with Node.js and Express. It handles user re
 | ...    |                    |                                        |   |   |
 |        |                    |                                        |   |   |
 
+## Project Structure
+```
+fa-auth/
+├── app.js
+├── index.js
+├── notes.md
+├── package-lock.json
+├── package.json
+├── readme.md
+└── src/
+    ├── api/
+    │   ├── controllers/
+    │   │   └── AutController.js
+    │   └── routers/
+    │       └── AuthRouter.js
+    ├── configs/
+    │   └── connections.js
+    ├── models/
+    │   └── Identity.js
+    ├── services/
+    │   └── AuthService.js
+    └── utils/
+        └── genToken.js
+```
+
 ## Getting Started
 + Prerequisites
 + Clone the repo
@@ -24,3 +49,8 @@ A authentication microservice built with Node.js and Express. It handles user re
 PLACEHOLDER
 ```
 
+## Pending Work
++ Send user profile message to Rabbit MQ
++ Add refresh token
++ implement user logout
++ Implement password management

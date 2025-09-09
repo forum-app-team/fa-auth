@@ -1,4 +1,8 @@
+# Ingoring node_modules/
 node_modules/
 
+# Ignoring local env configs
 .env
 
+# Ignoring notes.md
+notes.md
