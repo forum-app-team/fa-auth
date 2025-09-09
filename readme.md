@@ -44,12 +44,31 @@ fa-auth/
 + Install dependencies
 
 ## Configuration
+### `.env`
 + Create a `.env` file locally with the following variables:
 ```
-PLACEHOLDER
+JWT_ACCESS_SECRET=
+JWT_REFRESH_SECRET=
+PORT=5001
+DATABASE_NAME=forum_app
+DATABASE_SOCKET=/tmp/mysql.sock
+DATABASE_USER=
+DATABASE_PASSWORD=
+DATABASE_HOST=localhost
 ```
 
+### Database
+
+```bash
+$ cd src
+$ npx sequelize-cli init
+$ npx sequelize-cli db:migrate --config config/config.js
+
+```
+
+
 ## Pending Work
++ Global Error Handling
 + Send user profile message to Rabbit MQ
 + Add refresh token
 + implement user logout

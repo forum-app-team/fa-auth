@@ -1,8 +1,8 @@
 import {json} from "express";
 import * as argon2 from 'argon2';
 
-import Identity from '../models/Identity';
-import genToken from '../utils/genToken';
+import Identity from '../models/Identity.js';
+import genToken from '../utils/genToken.js';
 import { where } from "sequelize";
 
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
@@ -56,7 +56,7 @@ export const loginUser = async (email, password) => {
         return {accessToken};
 
     } catch(error) {
-        console.log(error);
+        console.log("Error caught: \n", error);
     }
 }
 
