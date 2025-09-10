@@ -6,26 +6,26 @@
 import { registerUser, loginUser, updateUserIdentity } from "../../services/AuthService.js";
 
 
-const postUserRegister = async (req, res) => {
+const postUserRegister = async (req, res, next) => {
     try {
-        const newIdentity = await registerUser(req.body);
-        return res.status(201).json({id: newIdentity.id, email: newIdentity.email});
+        const {email, password, firstName, lastName} = req.body || {};
+        const newIdentity = await registerUser(email, password, firstName, lastName);
+        return res.status(201).json({message: "Successfully creted new user"});
     } catch(error) {
-        console.log(error);
-        return res.status(500).json({message: error})
+        next(error);
     }
 };
 
-const postUserLogin = async (req, res) => {
+const postUserLogin = async (req, res, next) => {
     try {
-        const {accessToken} = await loginUser(req.body);
+        const {email, password} = req.body || {};
+        const {accessToken} = await loginUser(email, password);
         res.cookie("accessToken", accessToken, {httpOnly: true, maxAge: 60 * 60 * 1000});
 
         return res.status(200).json({message: "Successfully signed in"});
 
     } catch(error) {
-        console.log("Error caught: \n", error);
-        return res.status(500).json({message: error})
+        next(error);
     }
 }
 
@@ -34,15 +34,16 @@ const getUserLogout = async (_req, res, next) => {
         res.clearCookie("accessToken");
         return res.status(200).json({message: "Successfully logged out"});
     } catch(error) {
-        // res.status(500).json({message: error})
         next(error);
     }
 };
 
 const putUserIdentity = async (req, res, next) => {
     try {
-        const updates = await updateUserIdentity(req.currUser.userId, req.body);
-        return res.status(200).json({message: "Successfully updated Identity"});
+        const {currentPassword, newPassword, newEmail} = req.body || {};
+        const userId = req.currUser.userId || null;
+        const updates = await updateUserIdentity(userId, currentPassword, newPassword, newEmail);
+        return res.status(200).json({message: "Successfully updated Identity", details: updates});
     } catch(error) {
         next(error);
     }

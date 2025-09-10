@@ -12,31 +12,37 @@ A authentication microservice built with Node.js and Express. It handles user re
 | POST   | /api/auth/login      | Logs in a user and returns a JWT token      |
 | GET    | /api/auth/logout     | Logs out a user                             |
 | PUT    | /api/auth/identity   | Updates user email address and/or password  |
-|        |                      |                                             |
 
 ## Project Structure
 ```
 fa-auth/
 ├── app.js
 ├── index.js
-├── notes.md
 ├── package-lock.json
 ├── package.json
 ├── readme.md
 └── src/
     ├── api/
     │   ├── controllers/
-    │   │   └── AutController.js
+    │   │   └── AuthController.js
     │   └── routers/
     │       └── AuthRouter.js
-    ├── configs/
+    ├── config/
+    │   ├── config.js
     │   └── connections.js
+    ├── middlewares/
+    │   ├── ErrorHandler.js
+    │   └── ParseIDMiddleware.js
+    ├── migrations/
     ├── models/
     │   └── Identity.js
+    ├── seeders/
     ├── services/
     │   └── AuthService.js
     └── utils/
-        └── genToken.js
+        ├── error.js
+        ├── genToken.js
+        └── verifyPwd.js
 ```
 
 ## Getting Started
@@ -64,7 +70,6 @@ DATABASE_HOST=localhost
 $ cd src
 $ npx sequelize-cli init
 $ npx sequelize-cli db:migrate --config config/config.js
-
 ```
 
 
@@ -79,5 +84,4 @@ $ npx sequelize-cli db:migrate --config config/config.js
 ### `src/services/AuthServices.js`
 + At `registerUser()`: Sending user profile data to Rabbit MQ -> User service
 + At `registerUser()`: Sending user email to Rabbit MQ -> Email Service (initial email verification)
-+ At `registerUser()`: Uploading user profile image
 + At `updateUserIdentity()`: Sending updated email address to Rabbit MQ -> Email service for verification
