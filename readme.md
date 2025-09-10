@@ -15,13 +15,45 @@ A authentication microservice built with Node.js and Express. It handles user re
     - Consistent error objects with proper HTTP status codes and messages
 
 ## API Endpoints
+```
+| Method | Endpoint           | Description                            | Auth Required | Body Parameters                                           |
+| ------ | ------------------ | -------------------------------------- | ------------- | --------------------------------------------------------- |
+| POST   | /api/auth/register | Register a new user                    | No            | `email`, `password`, `firstName`, `lastName`              |
+| POST   | /api/auth/login    | Logs in a user and returns a JWT token | No            | `email`, `password`                                       |
+| GET    | /api/auth/logout   | Logs out a user                        | Yes           |  None                                                     |
+| PUT    | /api/auth/identity | Update email/password                  | Yes           | `currentPassword` (required), `newPassword?`, `newEmail?` |
+```
+* At least one of `newPassword`, `newEmail` should be provided when calling `PUT /api/auth/identity`
 
-| Method | Endpoint             | Description                                 | Auth Required |
-|--------|----------------------|---------------------------------------------|---------------|
-| POST   | /api/auth/register   | Register a new user                         | No            |
-| POST   | /api/auth/login      | Logs in a user and returns a JWT token      | No            |
-| GET    | /api/auth/logout     | Logs out a user                             | Yes           |
-| PUT    | /api/auth/identity   | Updates user email address and/or password  | Yes           |
+## Model & JWT Payload
+### Identity Model
+The `Identity` model represents a user’s authentication and identity information. It is defined using Sequelize ORM and stored in the `identities` table.
+#### Fields
+```
+| Field           | Type    | Required | Default    | Description                                               |
+| --------------- | ------- | -------- | ---------- | --------------------------------------------------------- |
+| `id`            | UUID    | Yes      | UUIDV4     | Primary key for each identity record.                     |
+| `email`         | STRING  | Yes      | —          | User email, must be *unique* and a valid email format.    |
+| `passwordHash`  | STRING  | Yes      | —          | Hashed password for authentication.                       |
+| `role`          | STRING  | Yes      | `'normal'` | Role of the user (e.g., normal, admin).                   |
+| `isActive`      | BOOLEAN | Yes      | `true`     | Indicates whether the user account is active or banned.   |
+| `emailVerified` | BOOLEAN | Yes      | `false`    | Indicates if the user's email has been verified.          |
+```
+
+### JWT Token Payload
+When issuing a JWT token for authentication, the following payload is used:
+```js
+// const identity = await Identity.findOne({ where: { email } });
+const payload = {
+    sub: identity.id,          // User ID
+    role: identity.role,       // User role
+    emailVerified: identity.emailVerified // Whether the user's email is verified
+};
+```
++ sub: Subject of the token, set to the user’s unique id.
++ role: See the fields above.
++ emailVerified: see the fields above.
+
 
 ## Project Structure
 ```
