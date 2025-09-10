@@ -3,15 +3,25 @@
 A authentication microservice built with Node.js and Express. It handles user registration, login, and JWT-based session management.
 
 ## Features
++ **User Authentication**
+    - Secure login / Logout with JWT
+    - Registration with hashed password storage (Argon 2)
++ **User Identity Management**
+    - Update credentials (email, password)
++ **Access Control**
+  - Account deactivation check
+  - Email verification flag included in tokens
++ **Error Handling**
+    - Consistent error objects with proper HTTP status codes and messages
 
 ## API Endpoints
 
-| Method | Endpoint             | Description                                 |
-|--------|----------------------|---------------------------------------------|
-| POST   | /api/auth/register   | Register a new user                         | 
-| POST   | /api/auth/login      | Logs in a user and returns a JWT token      |
-| GET    | /api/auth/logout     | Logs out a user                             |
-| PUT    | /api/auth/identity   | Updates user email address and/or password  |
+| Method | Endpoint             | Description                                 | Auth Required |
+|--------|----------------------|---------------------------------------------|---------------|
+| POST   | /api/auth/register   | Register a new user                         | No            |
+| POST   | /api/auth/login      | Logs in a user and returns a JWT token      | No            |
+| GET    | /api/auth/logout     | Logs out a user                             | Yes           |
+| PUT    | /api/auth/identity   | Updates user email address and/or password  | Yes           |
 
 ## Project Structure
 ```
@@ -46,9 +56,12 @@ fa-auth/
 ```
 
 ## Getting Started
-+ Prerequisites
-+ Clone the repo
-+ Install dependencies
++ Prerequisites: 
+    - Node.js (v22 recommended)
+    - A running MySQL Database (or your DB of choice), with credentials stored in `.env`
+    - [Optional] Docker
++ Clone this repository
++ Run `npm install`
 
 ## Configuration
 ### `.env`
@@ -65,20 +78,19 @@ DATABASE_HOST=localhost
 ```
 
 ### Database
-
+To initialize the database for local development and testing, follow the following steps:
 ```bash
 $ cd src
 $ npx sequelize-cli init
 $ npx sequelize-cli db:migrate --config config/config.js
 ```
 
-
 ## Pending Work
-+ Global Error Handling
-+ Send user profile message to Rabbit MQ
-+ Add refresh token
-+ implement user logout
-+ Implement password management
++ Global Error Handling (DONE)
++ Send user profile message to Rabbit MQ (Pending)
++ Add refresh token (Pending)
++ implement user logout (DONE)
++ Implement password management (DONE)
 
 ## Placeholders
 ### `src/services/AuthServices.js`
