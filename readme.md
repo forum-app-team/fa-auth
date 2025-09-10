@@ -6,12 +6,13 @@ A authentication microservice built with Node.js and Express. It handles user re
 
 ## API Endpoints
 
-| Method | Endpoint           | Description                            |   |   |
-|--------|--------------------|----------------------------------------|---|---|
-| POST   | /api/auth/register | Register a new user                    |   |   |
-| POST   | /api/auth/login    | Logs in a user and returns a JWT token |   |   |
-| ...    |                    |                                        |   |   |
-|        |                    |                                        |   |   |
+| Method | Endpoint             | Description                                 |
+|--------|----------------------|---------------------------------------------|
+| POST   | /api/auth/register   | Register a new user                         | 
+| POST   | /api/auth/login      | Logs in a user and returns a JWT token      |
+| GET    | /api/auth/logout     | Logs out a user                             |
+| PUT    | /api/auth/identity   | Updates user email address and/or password  |
+|        |                      |                                             |
 
 ## Project Structure
 ```
@@ -73,3 +74,10 @@ $ npx sequelize-cli db:migrate --config config/config.js
 + Add refresh token
 + implement user logout
 + Implement password management
+
+## Placeholders
+### `src/services/AuthServices.js`
++ At `registerUser()`: Sending user profile data to Rabbit MQ -> User service
++ At `registerUser()`: Sending user email to Rabbit MQ -> Email Service (initial email verification)
++ At `registerUser()`: Uploading user profile image
++ At `updateUserIdentity()`: Sending updated email address to Rabbit MQ -> Email service for verification
