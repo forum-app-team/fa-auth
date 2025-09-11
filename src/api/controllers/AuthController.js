@@ -73,10 +73,18 @@ const postRefreshAccessToken = async (req, res, next) => {
 
 const getTestProtectedPage = async (_req, res, next) => {
     try {
-        return res.status(200).json("Test successful");
+        return res.status(200).json({message: "Test successful"});
     } catch(error) {
         next(error);
     }
 };
 
-export {postUserRegister, postUserLogin, getUserLogout, putUserIdentity, postRefreshAccessToken, getTestProtectedPage};
+const postTestProtectedPage = async (req, res, next) => {
+    try {
+        return res.status(200).json({message: "Test succesful", content: req.body});
+    } catch(error) {
+        next(error);
+    }
+};
+
+export {postUserRegister, postUserLogin, getUserLogout, putUserIdentity, postRefreshAccessToken, getTestProtectedPage, postTestProtectedPage};
