@@ -32,6 +32,18 @@ A authentication microservice built with Node.js and Express. It handles user re
 ### Fetching from the Front End
 The access token is now stored **in the Authorization header** instead of the cookies. You can obtain an access token from the `/login` endpoint or the newly added `/refresh` endpoint. Below are some minimal examples of fetching the protected endpoints from the front end:
 
+### Error Codes
+The API returns standard HTTP status codes to indicate the outcome of requests. Below is a summary of the main codes used:
+| Code   | Status                | Description / Scenario                                                                                             |
+| ------ | --------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 400    | Bad Request           | Missing required fields, no new credentials provided, or invalid input (e.g., new password/email same as current). |
+| 401    | Unauthorized          | Invalid credentials, missing/invalid/expired access token or refresh token.                                        |
+| 403    | Forbidden             | Authenticated but not allowed to perform the action (e.g., deactivated account).                                   |
+| 404    | Not Found             | User or resource not found.                                                                                        |
+| 409    | Conflict              | Attempt to create or update a resource that would cause a conflict (e.g., email already in use).                   |
+| 500    | Internal Server Error | Unexpected server errors during processing or saving data.                                                         |
+
+
 + Using `fetch`
 ```js
 // Assuming you have a valid accessToken stored
