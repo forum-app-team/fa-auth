@@ -15,15 +15,66 @@ A authentication microservice built with Node.js and Express. It handles user re
     - Consistent error objects with proper HTTP status codes and messages
 
 ## API Endpoints
+### List of Endpoints
 ```
-| Method | Endpoint           | Description                            | Auth Required | Body Parameters                                           |
-| ------ | ------------------ | -------------------------------------- | ------------- | --------------------------------------------------------- |
-| POST   | /api/auth/register | Register a new user                    | No            | `email`, `password`, `firstName`, `lastName`              |
-| POST   | /api/auth/login    | Logs in a user and returns a JWT token | No            | `email`, `password`                                       |
-| GET    | /api/auth/logout   | Logs out a user                        | Yes           |  None                                                     |
-| PUT    | /api/auth/identity | Update email/password                  | Yes           | `currentPassword` (required), `newPassword?`, `newEmail?` |
+| Method | Endpoint                 | Description                            | Auth Required | Body Parameters                                           |
+| ------ | ------------------------ | -------------------------------------- | ------------- | --------------------------------------------------------- |
+| POST   | /api/auth/register       | Register a new user                    | No            | `email`, `password`, `firstName`, `lastName`              |
+| POST   | /api/auth/login          | Logs in a user and returns a JWT token | No            | `email`, `password`                                       |
+| GET    | /api/auth/logout         | Logs out a user                        | Yes           |  None                                                     |
+| PUT    | /api/auth/identity       | Update email/password                  | Yes           | `currentPassword` (required), `newPassword?`, `newEmail?` |
+| POST   | /api/auth/refresh        | Refresh the access token               | No            | `None`                                                    |
+| GET    | /api/auth/test_protected | A protected page for API tests         | Yes           | `None`                                                    |
+| POST   | /api/auth/test_protected | A protected page for API tests         | Yes           | The API returns the request body itself under `content`.  |
 ```
 * At least one of `newPassword`, `newEmail` should be provided when calling `PUT /api/auth/identity`
+
+### Fetching from the Front End
+The access token is now stored **in the Authorization header** instead of the cookies. You can obtain an access token from the `/login` endpoint or the newly added `/refresh` endpoint. Below are some minimal examples of fetching the protected endpoints from the front end:
+
++ Using `fetch`
+```js
+// Assuming you have a valid accessToken stored
+const accessToken = "YOUR_ACCESS_TOKEN";
+const body = {
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+fetch("http://localhost:3000/api/test_protected", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${accessToken}`,
+    "Content-Type": "application/json"
+  },
+  credentials: "include" // to include refresh tokens
+
+  body: JSON.stringify(body) // if applicable
+})
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
+```
+
++ Using `axios`
+```js
+import axios from 'axios';
+
+axios.post(
+  'https://api.example.com/data', 
+  body, 
+  {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    withCredentials: true
+  }
+)
+  .then(res => console.log(res.data))
+  .catch(err => console.error(err));
+```
+
 
 ## Model & JWT Payload
 ### Identity Model
@@ -54,6 +105,8 @@ const payload = {
 + role: See the fields above.
 + emailVerified: see the fields above.
 
+**UPDATE** If you would like to modify the payload for local development or testing, it's located at `src/utils/genAccessTokenPayload.js`. 
+For permanent changes, please create a new PR. 
 
 ## Project Structure
 ```
@@ -63,6 +116,7 @@ fa-auth/
 ├── package-lock.json
 ├── package.json
 ├── readme.md
+├── .env
 └── src/
     ├── api/
     │   ├── controllers/
@@ -73,8 +127,8 @@ fa-auth/
     │   ├── config.js
     │   └── connections.js
     ├── middlewares/
-    │   ├── ErrorHandler.js
-    │   └── ParseIDMiddleware.js
+    │   ├── AuthMiddleware.js
+    │   └── ErrorHandler.js
     ├── migrations/
     ├── models/
     │   └── Identity.js
@@ -83,6 +137,7 @@ fa-auth/
     │   └── AuthService.js
     └── utils/
         ├── error.js
+        ├── genAccessTokenPayload.js
         ├── genToken.js
         └── verifyPwd.js
 ```
@@ -101,13 +156,18 @@ fa-auth/
 ```
 JWT_ACCESS_SECRET=
 JWT_REFRESH_SECRET=
+JWT_ACCESS_EXPIRE=15m
+JWT_REFRESH_EXPIRE=7d
+
 PORT=5001
+
 DATABASE_NAME=forum_app
 DATABASE_SOCKET=/tmp/mysql.sock
 DATABASE_USER=
 DATABASE_PASSWORD=
 DATABASE_HOST=localhost
 ```
++ A demo `.env` file can also be found in `.env.example`.
 
 ### Database
 To initialize the database for local development and testing, follow the following steps:
@@ -118,11 +178,7 @@ $ npx sequelize-cli db:migrate --config config/config.js
 ```
 
 ## Pending Work
-+ Global Error Handling (DONE)
-+ Send user profile message to Rabbit MQ (Pending)
-+ Add refresh token (Pending)
-+ implement user logout (DONE)
-+ Implement password management (DONE)
++ Add a table for refresh tokens to the DB
 
 ## Placeholders
 ### `src/services/AuthServices.js`
