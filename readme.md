@@ -16,7 +16,7 @@ A authentication microservice built with Node.js and Express. It handles user re
 
 ## API Endpoints
 ### List of Endpoints
-```
+
 | Method | Endpoint                 | Description                            | Auth Required | Body Parameters                                           |
 | ------ | ------------------------ | -------------------------------------- | ------------- | --------------------------------------------------------- |
 | POST   | /api/auth/register       | Register a new user                    | No            | `email`, `password`, `firstName`, `lastName`              |
@@ -26,7 +26,7 @@ A authentication microservice built with Node.js and Express. It handles user re
 | POST   | /api/auth/refresh        | Refresh the access token               | No            | `None`                                                    |
 | GET    | /api/auth/test_protected | A protected page for API tests         | Yes           | `None`                                                    |
 | POST   | /api/auth/test_protected | A protected page for API tests         | Yes           | The API returns the request body itself under `content`.  |
-```
+
 * At least one of `newPassword`, `newEmail` should be provided when calling `PUT /api/auth/identity`
 
 ### Fetching from the Front End
@@ -92,7 +92,7 @@ axios.post(
 ### Identity Model
 The `Identity` model represents a user’s authentication and identity information. It is defined using Sequelize ORM and stored in the `identities` table.
 #### Fields
-```
+
 | Field           | Type    | Required | Default    | Description                                               |
 | --------------- | ------- | -------- | ---------- | --------------------------------------------------------- |
 | `id`            | UUID    | Yes      | UUIDV4     | Primary key for each identity record.                     |
@@ -101,7 +101,7 @@ The `Identity` model represents a user’s authentication and identity informati
 | `role`          | STRING  | Yes      | `'normal'` | Role of the user (e.g., normal, admin).                   |
 | `isActive`      | BOOLEAN | Yes      | `true`     | Indicates whether the user account is active or banned.   |
 | `emailVerified` | BOOLEAN | Yes      | `false`    | Indicates if the user's email has been verified.          |
-```
+
 
 ### JWT Token Payload
 When issuing a JWT token for authentication, the following payload is used:
