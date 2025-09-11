@@ -3,7 +3,12 @@
 
 // import Identity from '../../models/Identity';
 // import genToken from '../../utils/genToken';
-import { registerUser, loginUser, updateUserIdentity } from "../../services/AuthService.js";
+import { 
+    registerUser, 
+    loginUser, 
+    updateUserIdentity, 
+    refreshAccessToken
+} from "../../services/AuthService.js";
 
 
 const postUserRegister = async (req, res, next) => {
@@ -19,19 +24,26 @@ const postUserRegister = async (req, res, next) => {
 const postUserLogin = async (req, res, next) => {
     try {
         const {email, password} = req.body || {};
-        const {accessToken} = await loginUser(email, password);
-        res.cookie("accessToken", accessToken, {httpOnly: true, maxAge: 60 * 60 * 1000});
+        const {accessToken, refreshToken} = await loginUser(email, password);
+        res.cookie("refreshToken", refreshToken, {httpOnly: true, sameSite: "strict", maxAge: 7 * 24 * 60 * 60 * 1000});
 
-        return res.status(200).json({message: "Successfully signed in"});
+        return res.status(200).json({message: "Successfully signed in", accessToken});
 
     } catch(error) {
         next(error);
     }
 }
 
-const getUserLogout = async (_req, res, next) => {
+const getUserLogout = async (req, res, next) => {
     try {
-        res.clearCookie("accessToken");
+        const refreshToken = req.cookies.refreshToken;
+
+        if (refreshToken) {
+            // await invalidateRefreshToken(refreshToken) // DB placeholder
+            console.log("");
+        }
+
+        res.clearCookie("refreshToken");
         return res.status(200).json({message: "Successfully logged out"});
     } catch(error) {
         next(error);
@@ -42,11 +54,29 @@ const putUserIdentity = async (req, res, next) => {
     try {
         const {currentPassword, newPassword, newEmail} = req.body || {};
         const userId = req.currUser.userId || null;
-        const updates = await updateUserIdentity(userId, currentPassword, newPassword, newEmail);
-        return res.status(200).json({message: "Successfully updated Identity", details: updates});
+        const {updates, newAccessToken} = await updateUserIdentity(userId, currentPassword, newPassword, newEmail);
+        return res.status(200).json({message: "Successfully updated Identity", details: updates, accessToken: newAccessToken});
     } catch(error) {
         next(error);
     }
 };
 
-export {postUserRegister, postUserLogin, getUserLogout, putUserIdentity};
+const postRefreshAccessToken = async (req, res, next) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        const newAccessToken = await refreshAccessToken(refreshToken);
+        return res.status(200).json({message: "Successfully refreshed access token", accessToken: newAccessToken});
+    } catch(error) {
+        next(error);
+    }
+};
+
+const getTestProtectedPage = async (_req, res, next) => {
+    try {
+        return res.status(200).json("Test successful");
+    } catch(error) {
+        next(error);
+    }
+};
+
+export {postUserRegister, postUserLogin, getUserLogout, putUserIdentity, postRefreshAccessToken, getTestProtectedPage};
