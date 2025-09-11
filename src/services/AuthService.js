@@ -12,7 +12,7 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_ACCESS_EXPIRE = process.env.JWT_ACCESS_EXPIRE;
 const JWT_REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE;
 
-export const registerUser = async (email, password, firstName, lastName) => {
+const registerUser = async (email, password, firstName, lastName) => {
     if (!email || !password || !firstName || !lastName) {
         throw new AuthError("Missing required registration fields", 400);
         
@@ -41,7 +41,7 @@ export const registerUser = async (email, password, firstName, lastName) => {
     return newIdentity;
 };
 
-export const loginUser = async (email, password) => {
+const loginUser = async (email, password) => {
     if (!email || !password) {
         throw new AuthError("Email and password are required", 400);
     }
@@ -74,7 +74,7 @@ export const loginUser = async (email, password) => {
 
 };
 
-export const updateUserIdentity = async (userId, currentPassword, newPassword, newEmail) => {
+const updateUserIdentity = async (userId, currentPassword, newPassword, newEmail) => {
     if (!userId) {
         throw new AuthError("No User ID provided", 400);
     }
@@ -128,7 +128,7 @@ export const updateUserIdentity = async (userId, currentPassword, newPassword, n
 
 };
 
-export const refreshAccessToken = async (refreshToken) => {
+const refreshAccessToken = async (refreshToken) => {
     if (!refreshToken) {
         throw new AuthError("No refresh token provided", 401);
     }
@@ -156,3 +156,5 @@ export const refreshAccessToken = async (refreshToken) => {
     return newAccessToken;
 
 };
+
+export {registerUser, loginUser, updateUserIdentity, refreshAccessToken};
