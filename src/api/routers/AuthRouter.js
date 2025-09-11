@@ -7,7 +7,8 @@ import {
     getUserLogout,
     putUserIdentity,
     postRefreshAccessToken,
-    getTestProtectedPage 
+    getTestProtectedPage,
+    postTestProtectedPage
 } from '../controllers/AuthController.js';
 
 const AuthRouter = express.Router()
@@ -19,6 +20,7 @@ AuthRouter
     .put("/identity", authenticateIdentity, putUserIdentity)
     .post("/refresh", postRefreshAccessToken)
     .get("/test_protected", authenticateIdentity, getTestProtectedPage)
+    .post("/test_protected", authenticateIdentity, postTestProtectedPage)
 ;
 
 export default AuthRouter;
