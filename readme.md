@@ -3,16 +3,31 @@
 A authentication microservice built with Node.js and Express. It handles user registration, login, and JWT-based session management.
 
 ## Features
-+ **User Authentication**
-    - Secure login / Logout with JWT
-    - Registration with hashed password storage (Argon 2)
-+ **User Identity Management**
-    - Update credentials (email, password)
-+ **Access Control**
-  - Account deactivation check
-  - Email verification flag included in tokens
-+ **Error Handling**
-    - Consistent error objects with proper HTTP status codes and messages
+### Authentication
++ User Registration
+
+  Create a new user account with email, password, and profile details (firstName, lastName).
+
++ User Login
+
+  Log in the user with email, password, and issue an access token for frontend use. A refresh token is stored in an HTTP-only cookie.
+
++ User Logout
+
+  Log out the user and clear the refresh token cookie.
+
++ Refresh Access Token
+  
+  Generate a new access token using the refresh token stored in cookies.
+
+### User Management
++ Get Current User Identity
+
+  Retrieve the authenticated user’s identity, including id, email, role, and emailVerified status.
+
++ Update User Identity
+  
+  Update user information such as email or password. Returns a new access token after update.
 
 ## API Endpoints
 ### List of Endpoints
