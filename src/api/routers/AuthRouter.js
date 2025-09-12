@@ -5,6 +5,7 @@ import {
     postUserRegister, 
     postUserLogin, 
     getUserLogout,
+    getUserIdentity,
     putUserIdentity,
     postRefreshAccessToken,
     getTestProtectedPage,
@@ -17,6 +18,7 @@ AuthRouter
     .post("/register", postUserRegister)
     .post("/login", postUserLogin)
     .get("/logout", getUserLogout)
+    .get("/identity", authenticateIdentity, getUserIdentity)
     .put("/identity", authenticateIdentity, putUserIdentity)
     .post("/refresh", postRefreshAccessToken)
     .get("/test_protected", authenticateIdentity, getTestProtectedPage)
