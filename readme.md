@@ -58,10 +58,6 @@ A authentication microservice built with Node.js and Express. It handles user re
 | GET    | /api/auth/test-protected | 200            | `{ "message": "Test successful" }`                                                              |
 | POST   | /api/auth/test-protected | 200            | `{ "message": "Test successful", "content": req.body }`                                         |
 
-
-### Fetching from the Front End
-The access token is now stored **in the Authorization header** instead of the cookies. You can obtain an access token from the `/login` endpoint or the newly added `/refresh` endpoint. Below are some minimal examples of fetching the protected endpoints from the front end:
-
 ### Error Codes
 The API returns standard HTTP status codes to indicate the outcome of requests. Below is a summary of the main codes used:
 | Code   | Status                | Description / Scenario                                                                                             |
@@ -73,6 +69,9 @@ The API returns standard HTTP status codes to indicate the outcome of requests. 
 | 409    | Conflict              | Attempt to create or update a resource that would cause a conflict (e.g., email already in use).                   |
 | 500    | Internal Server Error | Unexpected server errors during processing or saving data.                                                         |
 
+
+### Fetching from the Front End
+The access token is now stored **in the Authorization header** instead of the cookies. You can obtain an access token from the `/login` endpoint or the newly added `/refresh` endpoint. Below are some minimal examples of fetching the protected endpoints from the front end:
 
 + Using `fetch`
 ```js
