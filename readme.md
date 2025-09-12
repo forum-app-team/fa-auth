@@ -137,7 +137,7 @@ When issuing a JWT token for authentication, the following payload is used:
 // const identity = await Identity.findOne({ where: { email } });
 const payload = {
     sub: identity.id,          // User ID
-    email: identity.email      // User Email
+    email: identity.email,     // User Email
     role: identity.role,       // User role
     emailVerified: identity.emailVerified // Whether the user's email is verified
 };
