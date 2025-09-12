@@ -28,6 +28,7 @@ const authenticateIdentity = (req, _res, next) => {
 
         req.currUser = {
             userId: payload.sub,
+            role: payload.role,
             email: payload.email
         };
 
