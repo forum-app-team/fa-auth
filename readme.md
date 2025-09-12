@@ -3,16 +3,31 @@
 A authentication microservice built with Node.js and Express. It handles user registration, login, and JWT-based session management.
 
 ## Features
-+ **User Authentication**
-    - Secure login / Logout with JWT
-    - Registration with hashed password storage (Argon 2)
-+ **User Identity Management**
-    - Update credentials (email, password)
-+ **Access Control**
-  - Account deactivation check
-  - Email verification flag included in tokens
-+ **Error Handling**
-    - Consistent error objects with proper HTTP status codes and messages
+### Authentication
++ User Registration
+
+  Create a new user account with email, password, and profile details (firstName, lastName).
+
++ User Login
+
+  Log in the user with email, password, and issue an access token for frontend use. A refresh token is stored in an HTTP-only cookie.
+
++ User Logout
+
+  Log out the user and clear the refresh token cookie.
+
++ Refresh Access Token
+  
+  Generate a new access token using the refresh token stored in cookies.
+
+### User Management
++ Get Current User Identity
+
+  Retrieve the authenticated user’s identity, including id, email, role, and emailVerified status.
+
++ Update User Identity
+  
+  Update user information such as email or password. Returns a new access token after update.
 
 ## API Endpoints
 ### List of Endpoints
@@ -22,6 +37,7 @@ A authentication microservice built with Node.js and Express. It handles user re
 | POST   | /api/auth/register       | Register a new user                    | No            | `email`, `password`, `firstName`, `lastName`              |
 | POST   | /api/auth/login          | Logs in a user and returns a JWT token | No            | `email`, `password`                                       |
 | GET    | /api/auth/logout         | Logs out a user                        | Yes           |  None                                                     |
+| GET    | /api/auth/identity       | Retrieve access token payload          | Yes           |  None                                                     |
 | PUT    | /api/auth/identity       | Update email/password                  | Yes           | `currentPassword` (required), `newPassword?`, `newEmail?` |
 | POST   | /api/auth/refresh        | Refresh the access token               | No            | `None`                                                    |
 | GET    | /api/auth/test_protected | A protected page for API tests         | Yes           | `None`                                                    |
@@ -29,8 +45,18 @@ A authentication microservice built with Node.js and Express. It handles user re
 
 * At least one of `newPassword`, `newEmail` should be provided when calling `PUT /api/auth/identity`
 
-### Fetching from the Front End
-The access token is now stored **in the Authorization header** instead of the cookies. You can obtain an access token from the `/login` endpoint or the newly added `/refresh` endpoint. Below are some minimal examples of fetching the protected endpoints from the front end:
+### Responses
+
+| Method | Endpoint                 | Success Status | Response Body                                                                                   |
+| ------ | ------------------------ | -------------- | ----------------------------------------------------------------------------------------------- |
+| POST   | /api/auth/register       | 201            | `{ "message": "Successfully created new user" }`                                                |
+| POST   | /api/auth/login          | 200            | `{ "message": "Successfully signed in", "accessToken": "<token>" }`                             |
+| GET    | /api/auth/logout         | 200            | `{ "message": "Successfully logged out" }`                                                      |
+| GET    | /api/auth/identity       | 200            | `{ "message": "Successfully retrieved identity", "identity": <token payload> }`                 |
+| PUT    | /api/auth/identity       | 200            | `{ "message": "Successfully updated identity", "details": updates, "accessToken": <token> }`    |
+| POST   | /api/auth/refresh        | 200            | `{ "message": "Successfully refreshed access token", "accessToken": <token> }`                  |
+| GET    | /api/auth/test_protected | 200            | `{ "message": "Test successful" }`                                                              |
+| POST   | /api/auth/test_protected | 200            | `{ "message": "Test successful", "content": req.body }`                                         |
 
 ### Error Codes
 The API returns standard HTTP status codes to indicate the outcome of requests. Below is a summary of the main codes used:
@@ -43,6 +69,9 @@ The API returns standard HTTP status codes to indicate the outcome of requests. 
 | 409    | Conflict              | Attempt to create or update a resource that would cause a conflict (e.g., email already in use).                   |
 | 500    | Internal Server Error | Unexpected server errors during processing or saving data.                                                         |
 
+
+### Fetching from the Front End
+The access token is now stored **in the Authorization header** instead of the cookies. You can obtain an access token from the `/login` endpoint or the newly added `/refresh` endpoint. Below are some minimal examples of fetching the protected endpoints from the front end:
 
 + Using `fetch`
 ```js
@@ -72,15 +101,14 @@ fetch("http://localhost:3000/api/test_protected", {
 ```js
 import axios from 'axios';
 
-axios.post(
-  'https://api.example.com/data', 
-  body, 
+axios.post("http://localhost:3000/api/test_protected", 
+  body, // if applicable
   {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json'
     },
-    withCredentials: true
+    withCredentials: true // to include refresh tokens
   }
 )
   .then(res => console.log(res.data))
@@ -109,6 +137,7 @@ When issuing a JWT token for authentication, the following payload is used:
 // const identity = await Identity.findOne({ where: { email } });
 const payload = {
     sub: identity.id,          // User ID
+    email: identity.email,     // User Email
     role: identity.role,       // User role
     emailVerified: identity.emailVerified // Whether the user's email is verified
 };
@@ -139,8 +168,9 @@ fa-auth/
     │   ├── config.js
     │   └── connections.js
     ├── middlewares/
-    │   ├── AuthMiddleware.js
-    │   └── ErrorHandler.js
+    │   ├── AuthMiddleware.js    
+    │   ├── ErrorHandler.js
+    │   └── ValidateInputMiddleware.js
     ├── migrations/
     ├── models/
     │   └── Identity.js

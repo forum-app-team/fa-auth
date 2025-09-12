@@ -1,10 +1,13 @@
 import express from 'express';
 
 import authenticateIdentity from '../../middlewares/AuthMiddleware.js';
+import validateInput from '../../middlewares/ValidateInputMiddleware.js';
+
 import { 
     postUserRegister, 
     postUserLogin, 
     getUserLogout,
+    getUserIdentity,
     putUserIdentity,
     postRefreshAccessToken,
     getTestProtectedPage,
@@ -15,10 +18,21 @@ import AdminRouter from './AdminRouter.js';
 const AuthRouter = express.Router()
 
 AuthRouter
-    .post("/register", postUserRegister)
-    .post("/login", postUserLogin)
+    .post(
+        "/register", 
+        validateInput(["email", "password", "firstName", "lastName"]), 
+        postUserRegister
+    )
+    .post("/login", 
+        validateInput(["email", "password"]),
+        postUserLogin
+    )
     .get("/logout", getUserLogout)
-    .put("/identity", authenticateIdentity, putUserIdentity)
+    .get("/identity", authenticateIdentity, getUserIdentity)
+    .put("/identity", 
+        authenticateIdentity, 
+        validateInput(["currentPassword"]),
+        putUserIdentity)
     .post("/refresh", postRefreshAccessToken)
     .get("/test_protected", authenticateIdentity, getTestProtectedPage)
     .post("/test_protected", authenticateIdentity, postTestProtectedPage)

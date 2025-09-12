@@ -50,12 +50,27 @@ const getUserLogout = async (req, res, next) => {
     }
 };
 
+const getUserIdentity = async (req, res, next) => {
+    try {
+        return res.status(200).json({
+            message: "Successfully retrieved identity", 
+            identity: req.currUser
+        });
+    } catch(error) {
+        next(error);
+    }
+}
+
 const putUserIdentity = async (req, res, next) => {
     try {
         const {currentPassword, newPassword, newEmail} = req.body || {};
         const userId = req.currUser.userId || null;
         const {updates, newAccessToken} = await updateUserIdentity(userId, currentPassword, newPassword, newEmail);
-        return res.status(200).json({message: "Successfully updated Identity", details: updates, accessToken: newAccessToken});
+        return res.status(200).json({
+            message: "Successfully updated identity", 
+            details: updates, 
+            accessToken: newAccessToken
+        });
     } catch(error) {
         next(error);
     }
@@ -65,7 +80,10 @@ const postRefreshAccessToken = async (req, res, next) => {
     try {
         const refreshToken = req.cookies.refreshToken;
         const newAccessToken = await refreshAccessToken(refreshToken);
-        return res.status(200).json({message: "Successfully refreshed access token", accessToken: newAccessToken});
+        return res.status(200).json({
+            message: "Successfully refreshed access token", 
+            accessToken: newAccessToken
+        });
     } catch(error) {
         next(error);
     }
@@ -87,4 +105,13 @@ const postTestProtectedPage = async (req, res, next) => {
     }
 };
 
-export {postUserRegister, postUserLogin, getUserLogout, putUserIdentity, postRefreshAccessToken, getTestProtectedPage, postTestProtectedPage};
+export {
+    postUserRegister, 
+    postUserLogin, 
+    getUserLogout, 
+    getUserIdentity, 
+    putUserIdentity, 
+    postRefreshAccessToken, 
+    getTestProtectedPage, 
+    postTestProtectedPage
+};

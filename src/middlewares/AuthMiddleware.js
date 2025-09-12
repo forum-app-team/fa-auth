@@ -10,7 +10,7 @@ const authenticateIdentity = (req, _res, next) => {
         }
 
         const accessToken = authHearder.split(" ")[1];
-        console.log("Access Token Retrived: \n", accessToken);
+        // console.log("Access Token Retrived: \n", accessToken);
 
         if (!accessToken) {
             throw new AuthError("Invalid authorization header", 401);
@@ -28,8 +28,9 @@ const authenticateIdentity = (req, _res, next) => {
 
         req.currUser = {
             userId: payload.sub,
+            email: payload.email,
             role: payload.role,
-            email: payload.email
+            emailVerified: payload.emailVerified
         };
 
         next();
