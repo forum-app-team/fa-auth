@@ -169,8 +169,9 @@ fa-auth/
     │   ├── config.js
     │   └── connections.js
     ├── middlewares/
-    │   ├── AuthMiddleware.js
-    │   └── ErrorHandler.js
+    │   ├── AuthMiddleware.js    
+    │   ├── ErrorHandler.js
+    │   └── ValidateInputMiddleware.js
     ├── migrations/
     ├── models/
     │   └── Identity.js
