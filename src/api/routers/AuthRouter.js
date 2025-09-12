@@ -13,6 +13,7 @@ import {
     getTestProtectedPage,
     postTestProtectedPage
 } from '../controllers/AuthController.js';
+import AdminRouter from './AdminRouter.js';
 
 const AuthRouter = express.Router()
 
@@ -36,5 +37,6 @@ AuthRouter
     .get("/test_protected", authenticateIdentity, getTestProtectedPage)
     .post("/test_protected", authenticateIdentity, postTestProtectedPage)
 ;
+AuthRouter.use('/admin', AdminRouter);
 
 export default AuthRouter;
