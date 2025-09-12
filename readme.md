@@ -54,9 +54,9 @@ A authentication microservice built with Node.js and Express. It handles user re
 | GET    | /api/auth/logout         | 200            | `{ "message": "Successfully logged out" }`                                                      |
 | GET    | /api/auth/identity       | 200            | `{ "message": "Successfully retrieved identity", "identity": <token payload> }`                 |
 | PUT    | /api/auth/identity       | 200            | `{ "message": "Successfully updated identity", "details": updates, "accessToken": <token> }`    |
-| POST   | /api/auth/refresh-token  | 200            | `{ "message": "Successfully refreshed access token", "accessToken": <token> }`                  |
-| GET    | /api/auth/test-protected | 200            | `{ "message": "Test successful" }`                                                              |
-| POST   | /api/auth/test-protected | 200            | `{ "message": "Test successful", "content": req.body }`                                         |
+| POST   | /api/auth/refresh        | 200            | `{ "message": "Successfully refreshed access token", "accessToken": <token> }`                  |
+| GET    | /api/auth/test_protected | 200            | `{ "message": "Test successful" }`                                                              |
+| POST   | /api/auth/test_protected | 200            | `{ "message": "Test successful", "content": req.body }`                                         |
 
 ### Error Codes
 The API returns standard HTTP status codes to indicate the outcome of requests. Below is a summary of the main codes used:
