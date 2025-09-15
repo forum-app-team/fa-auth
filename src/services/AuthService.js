@@ -25,20 +25,20 @@ const registerUser = async (email, password, firstName, lastName) => {
     const passwordHash = await argon2.hash(password);
     const newIdentity = await Identity.create({ email, passwordHash });
 
-    const eventPayload = {
+    const payload = {
         userId: newIdentity.id,
         firstName: firstName,
         lastName: lastName,
-        dateJoined: new Date(),
+        // dateJoined: new Date(),
     }
 
     // await publishEvent(eventPayload); // placeholder: send profile data to Rabbit MQ
-    console.log("Message that should be sent to Rabbit MQ:", eventPayload)
+    // console.log("Message that should be sent to Rabbit MQ:", eventPayload)
 
     // placeholder: send email address to Rabbit MQ (So that new users can complete the
     // email verification later on)
 
-    return newIdentity;
+    return {newIdentity, payload};
 };
 
 const loginUser = async (email, password) => {
@@ -157,4 +157,26 @@ const refreshAccessToken = async (refreshToken) => {
 
 };
 
-export {registerUser, loginUser, updateUserIdentity, refreshAccessToken};
+const deleteIdentityById = async (userId) => {
+    if (!userId) {
+        throw new AuthError("No User ID provided", 400);
+    }
+    if (!newPassword && !newEmail) {
+        throw new AuthError("No new credentials provided", 400); // bad request
+    }
+    const identity = await Identity.findByPk(userId);
+    if (!identity) {
+        throw new AuthError("User not found", 404);
+    }
+
+    const deletedIdentity = await Identity.destroy({where: {id: userId}});
+
+    if (deletedIdentity === 0) {
+        throw new AuthError(`Failed to remove user ID ${userId}`, 500);
+    }
+
+    return deletedIdentity;
+    
+};
+
+export {registerUser, loginUser, updateUserIdentity, refreshAccessToken, deleteIdentityById};

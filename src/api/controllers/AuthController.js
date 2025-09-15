@@ -10,11 +10,16 @@ import {
     refreshAccessToken
 } from "../../services/AuthService.js";
 
+import publishUserCreated from "../../services/PublisherService.js";
+
 
 const postUserRegister = async (req, res, next) => {
     try {
         const {email, password, firstName, lastName} = req.body || {};
-        const newIdentity = await registerUser(email, password, firstName, lastName);
+        const {newIdentity, payload} = await registerUser(email, password, firstName, lastName);
+
+        await publishUserCreated(payload);
+
         return res.status(201).json({message: "Successfully creted new user"});
     } catch(error) {
         next(error);
