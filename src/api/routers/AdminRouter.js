@@ -12,8 +12,8 @@ const AdminRouter = express.Router()
 
 AdminRouter
     .get("/users", authenticateIdentity, authorizeRoles('super', 'admin'), getUsers)
-    .patch("/user/status", authenticateIdentity, authorizeRoles('super', 'admin'), patchUserStatus)
-    .patch("/user/role", authenticateIdentity, authorizeRoles('super'), patchUserRole)
+    .patch("/users/status", authenticateIdentity, authorizeRoles('super', 'admin'), patchUserStatus)
+    .patch("/users/role", authenticateIdentity, authorizeRoles('super'), patchUserRole)
 ;
 
 export default AdminRouter;
