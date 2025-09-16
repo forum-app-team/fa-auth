@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "node --watch index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "worker": "node --watch worker.js"
+    "worker": "node --watch workers/ProfileCreationFailureListener.js",
+    "cleanup": "node scripts/cleanupEmailTokens.js",
+    "cleanup:force": "node scripts/cleanupEmailTokens.js force"
   },
   "repository": {
     "type": "git",

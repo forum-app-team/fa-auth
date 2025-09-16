@@ -98,21 +98,21 @@ const postRefreshAccessToken = async (req, res, next) => {
     }
 };
 
-const getTestProtectedPage = async (_req, res, next) => {
-    try {
-        return res.status(200).json({message: "Test successful"});
-    } catch(error) {
-        next(error);
-    }
-};
+// const getTestProtectedPage = async (_req, res, next) => {
+//     try {
+//         return res.status(200).json({message: "Test successful"});
+//     } catch(error) {
+//         next(error);
+//     }
+// };
 
-const postTestProtectedPage = async (req, res, next) => {
-    try {
-        return res.status(200).json({message: "Test succesful", content: req.body});
-    } catch(error) {
-        next(error);
-    }
-};
+// const postTestProtectedPage = async (req, res, next) => {
+//     try {
+//         return res.status(200).json({message: "Test succesful", content: req.body});
+//     } catch(error) {
+//         next(error);
+//     }
+// };
 
 export {
     postUserRegister, 
@@ -121,6 +121,6 @@ export {
     getUserIdentity, 
     putUserIdentity, 
     postRefreshAccessToken, 
-    getTestProtectedPage, 
-    postTestProtectedPage
+    // getTestProtectedPage, 
+    // postTestProtectedPage
 };

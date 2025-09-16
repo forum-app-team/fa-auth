@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 
-import sequelize from "../config/connections";
+import sequelize from "../config/connections.js";
 
 const EMAIL_TOKEN_EXPIRE = process.env.EMAIL_TOKEN_EXPIRE;
 

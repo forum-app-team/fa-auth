@@ -10,8 +10,8 @@ import {
     getUserIdentity,
     putUserIdentity,
     postRefreshAccessToken,
-    getTestProtectedPage,
-    postTestProtectedPage
+    // getTestProtectedPage,
+    // postTestProtectedPage
 } from '../controllers/AuthController.js';
 import AdminRouter from './AdminRouter.js';
 import EmailRouter from './EmailRouter.js';
@@ -35,8 +35,8 @@ AuthRouter
         validateInput(["currentPassword"]),
         putUserIdentity)
     .post("/refresh", postRefreshAccessToken)
-    .get("/test_protected", authenticateIdentity, getTestProtectedPage)
-    .post("/test_protected", authenticateIdentity, postTestProtectedPage)
+    // .get("/test_protected", authenticateIdentity, getTestProtectedPage)
+    // .post("/test_protected", authenticateIdentity, postTestProtectedPage)
 ;
 AuthRouter.use('/admin', AdminRouter);
 AuthRouter.use(EmailRouter);

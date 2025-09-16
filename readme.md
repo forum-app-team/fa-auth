@@ -33,48 +33,95 @@ A authentication microservice built with Node.js and Express. It handles user re
   
   Update user information such as email or password. Returns a new access token after update.
 
+### Email Verification
++ Send Verification Email
+
+  Publish a message via Rabbit MQ which causes the email service to send a verification email when a new account is created, a user changes their email,
+  or a user requires a resend.
+
++ Validate the email verification link
+
+  Extract the token from the request query parameters, if it's valid, mark it as used, and update the user identity accordingly.
+
 ## API Endpoints
 ### List of Endpoints
 
-| Method | Endpoint                 | Description                            | Auth Required | Body Parameters                                           |
-| ------ | ------------------------ | -------------------------------------- | ------------- | --------------------------------------------------------- |
-| POST   | /api/auth/register       | Register a new user                    | No            | `email`, `password`, `firstName`, `lastName`              |
-| POST   | /api/auth/login          | Logs in a user and returns a JWT token | No            | `email`, `password`                                       |
-| GET    | /api/auth/logout         | Logs out a user                        | Yes           |  None                                                     |
-| GET    | /api/auth/identity       | Retrieve access token payload          | Yes           |  None                                                     |
-| PUT    | /api/auth/identity       | Update email/password                  | Yes           | `currentPassword` (required), `newPassword?`, `newEmail?` |
-| POST   | /api/auth/refresh        | Refresh the access token               | No            | `None`                                                    |
-| GET    | /api/auth/test_protected | A protected page for API tests         | Yes           | `None`                                                    |
-| POST   | /api/auth/test_protected | A protected page for API tests         | Yes           | The API returns the request body itself under `content`.  |
+#### Authentication Service
+
+| Method | Endpoint                  | Description                            | Auth Required | Body Parameters                                           |
+| ------ | ------------------------- | -------------------------------------- | ------------- | --------------------------------------------------------- |
+| POST   | `/api/auth/register`      | Register a new user                    | No            | `email`, `password`, `firstName`, `lastName`              |
+| POST   | `/api/auth/login`         | Logs in a user and returns a JWT token | No            | `email`, `password`                                       |
+| GET    | `/api/auth/logout`        | Logs out a user                        | Yes           |  None                                                     |
+| GET    | `/api/auth/identity`      | Retrieve access token payload          | Yes           |  None                                                     |
+| PUT    | `/api/auth/identity`      | Update email/password                  | Yes           | `currentPassword` (required), `newPassword?`, `newEmail?` |
+| POST   | `/api/auth/refresh`       | Refresh the access token               | No            | `None`                                                    |
+
+#### User Management Service (Admin only)
+
+| Method | Endpoint                  | Description                            | Auth Required | Body Parameters                                           |
+| ------ | ------------------------- | -------------------------------------- | ------------- | --------------------------------------------------------- |
+
+
+#### Email Verification Service:
+
+| Method | Endpoint                  | Description                            | Auth Required | Body Parameters                                           |
+| ------ | ------------------------- | -------------------------------------- | ------------- | --------------------------------------------------------- |
+| GET    | `/api/auth/verify-email`  | Validate the email verification token  | No            | `token` (query parameter: `?token=<token>`)               |
+| POST   | `/api/auth/verify-email`  | Send email verification link           | YES           |  None                                                     |
 
 * At least one of `newPassword`, `newEmail` should be provided when calling `PUT /api/auth/identity`
 
-### Responses
+### Success Responses
+#### Authentication Service
+
+| Method | Endpoint                   | Success Status | Response Body                                                                                   |
+| ------ | -------------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
+| POST   | `/api/auth/register`       | 201            | `{ "message": "Successfully created new user" }`                                                |
+| POST   | `/api/auth/login`          | 200            | `{ "message": "Successfully signed in", "accessToken": "<token>" }`                             |
+| GET    | `/api/auth/logout`         | 200            | `{ "message": "Successfully logged out" }`                                                      |
+| GET    | `/api/auth/identity`       | 200            | `{ "message": "Successfully retrieved identity", "identity": <token payload> }`                 |
+| PUT    | `/api/auth/identity`       | 200            | `{ "message": "Successfully updated identity", "details": updates, "accessToken": <token> }`    |
+| POST   | `/api/auth/refresh`        | 200            | `{ "message": "Successfully refreshed access token", "accessToken": <token> }`                  |
+
+
+#### User Management Service (Admin only)
 
 | Method | Endpoint                 | Success Status | Response Body                                                                                   |
 | ------ | ------------------------ | -------------- | ----------------------------------------------------------------------------------------------- |
-| POST   | /api/auth/register       | 201            | `{ "message": "Successfully created new user" }`                                                |
-| POST   | /api/auth/login          | 200            | `{ "message": "Successfully signed in", "accessToken": "<token>" }`                             |
-| GET    | /api/auth/logout         | 200            | `{ "message": "Successfully logged out" }`                                                      |
-| GET    | /api/auth/identity       | 200            | `{ "message": "Successfully retrieved identity", "identity": <token payload> }`                 |
-| PUT    | /api/auth/identity       | 200            | `{ "message": "Successfully updated identity", "details": updates, "accessToken": <token> }`    |
-| POST   | /api/auth/refresh        | 200            | `{ "message": "Successfully refreshed access token", "accessToken": <token> }`                  |
-| GET    | /api/auth/test_protected | 200            | `{ "message": "Test successful" }`                                                              |
-| POST   | /api/auth/test_protected | 200            | `{ "message": "Test successful", "content": req.body }`                                         |
 
-### Error Codes
-The API returns standard HTTP status codes to indicate the outcome of requests. Below is a summary of the main codes used:
-| Code   | Status                | Description / Scenario                                                                                             |
-| ------ | --------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| 400    | Bad Request           | Missing required fields, no new credentials provided, or invalid input (e.g., new password/email same as current). |
-| 401    | Unauthorized          | Invalid credentials, missing/invalid/expired access token or refresh token.                                        |
-| 403    | Forbidden             | Authenticated but not allowed to perform the action (e.g., deactivated account).                                   |
-| 404    | Not Found             | User or resource not found.                                                                                        |
-| 409    | Conflict              | Attempt to create or update a resource that would cause a conflict (e.g., email already in use).                   |
-| 500    | Internal Server Error | Unexpected server errors during processing or saving data.                                                         |
+#### Email Verification Service
+
+| Method | Endpoint                 | Success Status | Response Body                                                                               |
+| ------ | ------------------------ | -------------- | ------------------------------------------------------------------------------------------- |
+| GET    | `/api/auth/verify-email` | 200            | `{message: "Successfully verified email address", email: <email address>`                   |
+| POST   | `/api/auth/verify-email` | 200            | `{message: "Successfully sent verification email", link: <verification link>}`              |
 
 
-### Fetching from the Front End
+### Error Responses
+#### Authentication Service
+
+| Method | Endpoint             | Possible Errors                                                                                                  |
+| ------ | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| POST   | `/api/auth/register` | `400 Missing required registration fields`, `409 Email address already in use`                                   |
+| POST   | `/api/auth/login`    | `400 Email and password required`, `401 Invalid credentials`, `403 Account deactivated`                          |
+| PUT    | `/api/auth/identity` | `400 No User ID provided`, `400 No new credentials provided`, `400 New password cannot be the same as your current one`, `404 User not found`, `409 Email already in use by another account`, `500 Unexpected error when saving data` |
+| POST   | `/api/auth/refresh`  | `401 No refresh token provided`, `401 Invalid or expired refresh token`, `404 User not found`                    |
+
+#### User Management Service (Admin Only)
+
+| Method | Endpoint             | Possible Errors                                                                                                  |
+| ------ | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+
+#### Email Verification Service
+
+| Method | Endpoint             | Possible Errors                                                                                                  |
+| ------ | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/auth/verify-email`      | `400 No verification token provided`, `401 Invalid or expired token`, `401 Token already used`, `409 Stale token`, `404 User not found`, `409 Email already verified`, `500 Unexpected error when saving data` |
+| POST   | `/api/auth/verify-email` | `400 User ID and Email required`                                                                              |
+
+
+<!-- ### Fetching from the Front End
 The access token is now stored **in the Authorization header** instead of the cookies. You can obtain an access token from the `/login` endpoint or the newly added `/refresh` endpoint. Below are some minimal examples of fetching the protected endpoints from the front end:
 
 + Using `fetch`
@@ -117,13 +164,12 @@ axios.post("http://localhost:3000/api/test_protected",
 )
   .then(res => console.log(res.data))
   .catch(err => console.error(err));
-```
+``` -->
 
 
 ## Model & JWT Payload
-### Identity Model
+### User Identity
 The `Identity` model represents a user’s authentication and identity information. It is defined using Sequelize ORM and stored in the `identities` table.
-#### Fields
 
 | Field           | Type    | Required | Default    | Description                                               |
 | --------------- | ------- | -------- | ---------- | --------------------------------------------------------- |
@@ -133,6 +179,27 @@ The `Identity` model represents a user’s authentication and identity informati
 | `role`          | STRING  | Yes      | `'normal'` | Role of the user (e.g., normal, admin).                   |
 | `isActive`      | BOOLEAN | Yes      | `true`     | Indicates whether the user account is active or banned.   |
 | `emailVerified` | BOOLEAN | Yes      | `false`    | Indicates if the user's email has been verified.          |
+
+### Email Verification Token
+The `EmailToken` model represents one-time email verification tokens. 
+
+| Field       | Type    | Required | Default                            | Description                                                                 |
+| ----------- | ------- | -------- | ---------------------------------- | --------------------------------------------------------------------------- |
+| `id`        | UUID    | Yes      | UUIDV4                             | Primary key for each email token record.                                    |
+| `userId`    | UUID    | Yes      | —                                  | ID of the user this token belongs to. Multiple tokens per user are allowed. |
+| `token`     | STRING  | Yes      | —                                  | Unique verification token string.                                           |
+| `used`      | BOOLEAN | Yes      | `false`                            | Indicates whether the token has been used.                                  |
+| `createdAt` | DATE    | Yes      | `Now`                              | Timestamp when the token was created.                                       |
+| `expiresAt` | DATE    | Yes      | `Now + EMAIL_TOKEN_EXPIRE`         | Expiration timestamp for the token.                                         |
+| `usedAt`    | DATE    | No       | —                                  | Timestamp when the token was marked as used.                                |
+
+**IMPORTANT NOTE**
++ `EMAIL_TOKEN_EXPIRE` is located at `.env`.
++ An FK to `Identity.id` is **not** enforced because tokens may be generated before the user record is fully confirmed (from the user profile service 
+for example), and this avoids potential insertion failures while still allowing multiple tokens per user.
++ We can utilize the following commands to manually clean up the tokens:
+  - `$ npm run cleanup`: Clean up expired tokens.
+  - `$ npm run cleanup:force`: Clean up all tokens.
 
 
 ### JWT Token Payload
@@ -158,30 +225,46 @@ For permanent changes, please create a new PR.
 fa-auth/
 ├── app.js
 ├── index.js
+├── worker.js
 ├── package-lock.json
 ├── package.json
 ├── readme.md
+├── scripts/
+│   └── cleanupEmailTokens.js
+├── workers/
+│   └── ProfileCreationFailureListener.js
 ├── .env
 └── src/
     ├── api/
     │   ├── controllers/
-    │   │   └── AuthController.js
+    │   │   ├── AuthController.js
+    │   │   ├── AuthController.js
+    │   │   └── EmailController.js
     │   └── routers/
-    │       └── AuthRouter.js
+    │       ├── AuthRouter.js
+    │       ├── AuthRouter.js
+    │       └── EmailRouter.js
     ├── config/
     │   ├── config.js
     │   └── connections.js
     ├── middlewares/
-    │   ├── AuthMiddleware.js    
+    │   ├── AuthMiddleware.js
+    │   ├── AuthorizationMiddleware.js
     │   ├── ErrorHandler.js
     │   └── ValidateInputMiddleware.js
     ├── migrations/
     ├── models/
+    │   ├── EmailToken.js
     │   └── Identity.js
     ├── seeders/
     ├── services/
-    │   └── AuthService.js
+    │   ├── AdminService.js
+    │   ├── AuthService.js
+    │   ├── EmailVerificationService.js
+    │   ├── FailureConsumer.js
+    │   └── PublisherService.js
     └── utils/
+        ├── EmailVerificationUtils.js
         ├── error.js
         ├── genAccessTokenPayload.js
         ├── genToken.js
@@ -198,36 +281,12 @@ fa-auth/
 
 ## Configuration
 ### `.env`
-+ Create a `.env` file locally with the following variables:
-```
-JWT_ACCESS_SECRET=
-JWT_REFRESH_SECRET=
-JWT_ACCESS_EXPIRE=15m
-JWT_REFRESH_EXPIRE=7d
++ Create a `.env` file locally: `$ cp .env.example .env`
 
-PORT=5001
-
-DATABASE_NAME=forum_app
-DATABASE_SOCKET=/tmp/mysql.sock
-DATABASE_USER=
-DATABASE_PASSWORD=
-DATABASE_HOST=localhost
-```
-+ A demo `.env` file can also be found in `.env.example`.
-
-### Database
+### Database Migration
 To initialize the database for local development and testing, follow the following steps:
 ```bash
 $ cd src
 $ npx sequelize-cli init
 $ npx sequelize-cli db:migrate --config config/config.js
 ```
-
-## Pending Work
-+ Add a table for refresh tokens to the DB
-
-## Placeholders
-### `src/services/AuthServices.js`
-+ At `registerUser()`: Sending user profile data to Rabbit MQ -> User service
-+ At `registerUser()`: Sending user email to Rabbit MQ -> Email Service (initial email verification)
-+ At `updateUserIdentity()`: Sending updated email address to Rabbit MQ -> Email service for verification
