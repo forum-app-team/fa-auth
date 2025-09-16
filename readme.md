@@ -2,6 +2,10 @@
 
 A authentication microservice built with Node.js and Express. It handles user registration, login, and JWT-based session management.
 
+## Latest Update
++ To start the Rabbit MQ Message Consumer for Failed user creations, run `npm run worker`
++ Still need to add the consumer for email verification
+
 ## Features
 ### Authentication
 + User Registration

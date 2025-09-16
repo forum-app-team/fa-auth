@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import app from "./app.js";
 import sequelize from "./src/config/connections.js"
-import Identity from "./src/models/Identity.js";
+// import Identity from "./src/models/Identity.js";
 
 const PORT = process.env.PORT || 5001;
 
@@ -10,14 +10,14 @@ const PORT = process.env.PORT || 5001;
   try {
     await sequelize.authenticate();
     await sequelize.sync();
-    console.log("Database connected!");
+    console.log("Database connected");
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
 
   } catch (err) {
-    console.error("Unable to connect to the database:", err);
+    console.error("Unable to start service:", err);
     process.exit(1); 
   }
 })();
