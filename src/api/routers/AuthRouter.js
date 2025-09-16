@@ -14,6 +14,7 @@ import {
     postTestProtectedPage
 } from '../controllers/AuthController.js';
 import AdminRouter from './AdminRouter.js';
+import EmailRouter from './EmailRouter.js';
 
 const AuthRouter = express.Router()
 
@@ -38,5 +39,6 @@ AuthRouter
     .post("/test_protected", authenticateIdentity, postTestProtectedPage)
 ;
 AuthRouter.use('/admin', AdminRouter);
+AuthRouter.use(EmailRouter);
 
 export default AuthRouter;
