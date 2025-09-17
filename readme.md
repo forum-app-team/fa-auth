@@ -49,21 +49,23 @@ A authentication microservice built with Node.js and Express. It handles user re
 
 
 ## Getting Started
-+ Prerequisites: 
+### Prerequisites
++ System requirements
     - Node.js (v22 recommended)
-    - A running MySQL Database (or your DB of choice), with credentials stored in `.env`
+    - A running MySQL Database
     - [Optional] Docker
 + Clone this repository
-+ Run `npm install`
++ Run `npm install` under `fa-auth/`
 
-## Configuration
-### `.env`
-+ Create a `.env` file locally: `$ cp .env.example .env`
+### Congifure `.env`
++ Create a `.env` file: `$ cp .env.example .env`
++ Include your credentials in `.env`
 
 ### Database Migration
 
 **IMPORTANT** All commands should be executed at `src`:
 ```bash
+$ pwd        # it should be `~/path/to/fa-auth`
 $ cd src
 ```
 
