@@ -34,7 +34,8 @@ const Identity = sequelize.define("Identity", {
         defaultValue: false
     }
 }, {
-    tableName: 'identities'
+    tableName: 'identities',
+    timestamps: false,
 });
 
 export default Identity;

@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-import startFailureListener from "./src/services/FailureConsumer.js";
+import startFailureListener from "../src/services/FailureConsumer.js";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
 const RABBITMQ_FAILURE_EXCHANGE = process.env.RABBITMQ_FAILURE_EXCHANGE;

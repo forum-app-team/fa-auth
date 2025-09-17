@@ -1,8 +1,3 @@
-// import {json} from "express";
-// import * as argon2 from 'argon2';
-
-// import Identity from '../../models/Identity';
-// import genToken from '../../utils/genToken';
 import { 
     registerUser, 
     loginUser, 
@@ -11,7 +6,7 @@ import {
 } from "../../services/AuthService.js";
 
 import publishUserCreated from "../../services/PublisherService.js";
-
+import { sendVerificationEmail } from "../../services/EmailVerificationService.js";
 
 const postUserRegister = async (req, res, next) => {
     try {
@@ -19,6 +14,9 @@ const postUserRegister = async (req, res, next) => {
         const {newIdentity, payload} = await registerUser(email, password, firstName, lastName);
 
         await publishUserCreated(payload);
+
+        const {link} = await sendVerificationEmail(newIdentity.id, email);
+        console.log(`Verification email sent to ${email}, link:\n${link}`);
 
         return res.status(201).json({message: "Successfully creted new user"});
     } catch(error) {
@@ -71,6 +69,12 @@ const putUserIdentity = async (req, res, next) => {
         const {currentPassword, newPassword, newEmail} = req.body || {};
         const userId = req.currUser.userId || null;
         const {updates, newAccessToken} = await updateUserIdentity(userId, currentPassword, newPassword, newEmail);
+
+        if (newEmail) {
+            const {link} = await sendVerificationEmail(userId, newEmail);
+            console.log(`Verification email sent to ${newEmail}, link:\n${link}`);
+        }
+
         return res.status(200).json({
             message: "Successfully updated identity", 
             details: updates, 
@@ -94,21 +98,21 @@ const postRefreshAccessToken = async (req, res, next) => {
     }
 };
 
-const getTestProtectedPage = async (_req, res, next) => {
-    try {
-        return res.status(200).json({message: "Test successful"});
-    } catch(error) {
-        next(error);
-    }
-};
+// const getTestProtectedPage = async (_req, res, next) => {
+//     try {
+//         return res.status(200).json({message: "Test successful"});
+//     } catch(error) {
+//         next(error);
+//     }
+// };
 
-const postTestProtectedPage = async (req, res, next) => {
-    try {
-        return res.status(200).json({message: "Test succesful", content: req.body});
-    } catch(error) {
-        next(error);
-    }
-};
+// const postTestProtectedPage = async (req, res, next) => {
+//     try {
+//         return res.status(200).json({message: "Test succesful", content: req.body});
+//     } catch(error) {
+//         next(error);
+//     }
+// };
 
 export {
     postUserRegister, 
@@ -117,6 +121,6 @@ export {
     getUserIdentity, 
     putUserIdentity, 
     postRefreshAccessToken, 
-    getTestProtectedPage, 
-    postTestProtectedPage
+    // getTestProtectedPage, 
+    // postTestProtectedPage
 };

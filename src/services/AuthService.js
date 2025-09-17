@@ -107,18 +107,16 @@ const updateUserIdentity = async (userId, currentPassword, newPassword, newEmail
             throw new AuthError("Email already in use by another account", 409); 
         }
 
-        `placeholder: Message -> Broker -> Email service`
-        // sendVerificationEmail(newEmail);
-        // updates.emailChangeInitiated = true;
-
-        // for now, simply update the email in order to test the functionalities
-        identity.email = newEmail;
+        // set new email address
+        // identity.email = newEmail;
+        // mark `identity.emailVerified` as false
+        // identity.emailVerified = false;
     }
 
     try {
         await identity.save();
     } catch(error) {
-        throw new AuthError("Internal server error", 500);
+        throw new AuthError("Unexpected error when saving data", 500);
     }
 
     // don't forget to sign a new access token
