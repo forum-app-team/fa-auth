@@ -48,6 +48,76 @@ A authentication microservice built with Node.js and Express. It handles user re
   For local development, `BASE_URL` is set to `http://localhost:8080`. See `.env.example`.
 
 
+## Getting Started
++ Prerequisites: 
+    - Node.js (v22 recommended)
+    - A running MySQL Database (or your DB of choice), with credentials stored in `.env`
+    - [Optional] Docker
++ Clone this repository
++ Run `npm install`
+
+## Configuration
+### `.env`
++ Create a `.env` file locally: `$ cp .env.example .env`
+
+### Database Migration
+
+**IMPORTANT** All commands should be executed at `src`:
+```bash
+$ cd src
+```
+
+#### Initialization
+If you pulled this repository from remote, in most cases you do *not* need to run the following command that initializes the migration:
+
+```bash
+$ npx sequelize-cli init
+```
+
+#### Apply all current migrations
+This is where you get started after pulling the repository:
+```bash
+$ npx sequelize-cli db:migrate --config config/config.js
+```
+
+And you should be good to go.
+
+#### Apply Changes on the Schema from Remote
+
++ [Optional] Check `src/migrations` for a new migration file with `.cjs` extension.
++ Run the previous command:
+```bash
+$ npx sequelize-cli db:migrate --config config/config.js
+```
+
+#### Apply Changes on the Schema Locally
++ Create a new migration 
+```bash
+$ npx sequelize-cli migration:generate --name your-migration-name
+```
+
++ Edit the migration file `src/migrations/<timestamp>-your-migration-name.js` to 
+reflect the changes on the schema. Change the file extension from `.js` to `.cjs`.
+
++ Apply the changes:
+
+```bash
+$ npx sequelize-cli db:migrate --config config/config.js
+```
+
+
+#### Undo
++ Undo the most recent migration:
+```bash
+$ npx sequelize-cli db:migrate:undo --config config/config.js
+```
+
++ Undo all migrations:
+```bash
+$ npx sequelize-cli db:migrate:undo:all --config config/config.js
+```      
+
+
 ## API Endpoints
 ### List of Endpoints
 
@@ -230,43 +300,3 @@ fa-auth/
         ├── genToken.js
         └── verifyPwd.js
 ```
-
-## Getting Started
-+ Prerequisites: 
-    - Node.js (v22 recommended)
-    - A running MySQL Database (or your DB of choice), with credentials stored in `.env`
-    - [Optional] Docker
-+ Clone this repository
-+ Run `npm install`
-
-## Configuration
-### `.env`
-+ Create a `.env` file locally: `$ cp .env.example .env`
-
-### Database Migration
-+ To initialize the database for local development and testing, follow the following steps:
-```bash
-$ cd src
-$ npx sequelize-cli init # Only run at initialization
-```
-+ After initialization or any changes, run the following code:
-```bash
-$ npx sequelize-cli migration:generate --name your-migration-name
-$ npx sequelize-cli db:migrate --config config/config.js
-```
-
-
-+ To undo the most recent or all migrations, run
-```bash
-$ npx sequelize-cli db:migrate:undo --config config/config.js
-$ npx sequelize-cli db:migrate:undo:all --config config/config.js
-```      
-
-** Important Note **
-If you see 
-```
-ERROR: module is not defined in ES module scope
-This file is being treated as an ES module because it has a '.js' file extension and 'fa-auth/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
-```
-
-just follow the instructions.
