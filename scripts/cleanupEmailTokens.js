@@ -12,34 +12,34 @@ import sequelize from "../src/config/connections.js";
 const mode = process.argv[2] === "force" ? "force" : "normal";
 
 const cleanupEmailTokens = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log("Successfully connected to database");
+    try {
+        await sequelize.authenticate();
+        console.log("Successfully connected to database");
 
-    let result;
+        let result;
 
-    if (mode === "force") {
-      result = await EmailToken.destroy({ where: {} });
-      console.log(`Deleted all ${result} token(s)`);
-    } else {
+        if (mode === "force") {
+            result = await EmailToken.destroy({ where: {} });
+            console.log(`Deleted all ${result} token(s)`);
+        } else {
 
-      const now = new Date();
-      result = await EmailToken.destroy({
-        where: {
-          expiresAt: { [Op.lt]: now },
-        },
-      });
-      console.log(`Deleted ${result} expired token(s)`);
+            const now = new Date();
+            result = await EmailToken.destroy({
+                where: {
+                    expiresAt: { [Op.lt]: now },
+                },
+            });
+            console.log(`Deleted ${result} expired token(s)`);
+        }
+
+        await sequelize.close();
+
+        console.log("Cleanup complete");
+
+    } catch (err) {
+        console.error("Error during cleanup:", err);
+        process.exit(1);
     }
-
-    await sequelize.close();
-
-    console.log("Cleanup complete");
-
-  } catch (err) {
-    console.error("Error during cleanup:", err);
-    process.exit(1);
-  }
 };
 
 cleanupEmailTokens();

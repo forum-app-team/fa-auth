@@ -44,7 +44,8 @@ const EmailToken = sequelize.define("EmailToken", {
     },
 
 }, {
-    tableName: "email_tokens"
+    tableName: "email_tokens",
+    timestamps: false,
 });
 
 export default EmailToken;

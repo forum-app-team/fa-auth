@@ -1,10 +1,10 @@
 import amqp from "amqplib";
 import { Op } from "sequelize";
 
-import Identity from "../models/Identity";
-import EmailToken from "../models/EmailToken";
-import {genEmailVerificationToken} from "../utils/EmailVerificationUtils";
-import AuthError from "../utils/error";
+import Identity from "../models/Identity.js";
+import EmailToken from "../models/EmailToken.js";
+import {genEmailVerificationToken} from "../utils/EmailVerificationUtils.js";
+import AuthError from "../utils/error.js";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL;
 const RABBITMQ_EMAIL_EXCHANGE = process.env.RABBITMQ_EMAIL_EXCHANGE;
@@ -16,6 +16,12 @@ const BASE_URL = process.env.BASE_URL;
 const sendVerificationEmail = async (userId, email) => {
     if (!userId || !email) {
         throw new AuthError("User ID and Email required", 400);
+    }
+
+    const identity = await Identity.findByPk(userId);
+
+    if (identity.emailVerified) {
+        throw new AuthError("Email already verified", 409);
     }
     // connect to Rabbit MQ
     const conn = await amqp.connect(RABBITMQ_URL);
@@ -29,7 +35,12 @@ const sendVerificationEmail = async (userId, email) => {
         }
     );
 
-    await ch.assertQueue(`${RABBITMQ_EMAIL_EXCHANGE}.${RABBITMQ_EMAIL_ROUTING_KEY}`, { durable: true });
+    await ch.assertQueue(
+        `${RABBITMQ_EMAIL_EXCHANGE}.${RABBITMQ_EMAIL_ROUTING_KEY}`, 
+        { 
+            durable: true 
+        });
+        
     await ch.bindQueue(
         `${RABBITMQ_EMAIL_EXCHANGE}.${RABBITMQ_EMAIL_ROUTING_KEY}`,
         RABBITMQ_EMAIL_EXCHANGE,
@@ -63,7 +74,7 @@ const sendVerificationEmail = async (userId, email) => {
     ch.publish(RABBITMQ_EMAIL_EXCHANGE, RABBITMQ_EMAIL_ROUTING_KEY, Buffer.from(msg));
 
     console.log(" [x] Sent verification Email %s", msg);
-    return {payload, link};
+    return {payload, link, token};
 };
 
 const validateVerificationEmail = async (tokenString) => {
@@ -78,15 +89,16 @@ const validateVerificationEmail = async (tokenString) => {
         - A newer token exists for the same user ID
     The service will throw 401.
     `
-    const token = EmailToken.findOne({
+    const token = await EmailToken.findOne({
         where: {token: tokenString}
     });
 
-    const newerToken = EmailToken.findOne({
+    const newerToken = await EmailToken.findOne({
         where: {
-            userId: token.userId},
-            createdAt: {[Op.gt]: token.createdAt},
-        order: [["createdAt", "DESC"]],
+            userId: token.userId,
+            createdAt: {[Op.gt]: token.createdAt}
+        },
+        order: [["createdAt", "DESC"]]
     });
 
     if (!token || token.expiresAt < new Date()) {

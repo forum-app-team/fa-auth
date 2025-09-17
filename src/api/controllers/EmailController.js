@@ -1,7 +1,7 @@
 import { 
     sendVerificationEmail, 
     validateVerificationEmail 
-} from "../../services/EmailVerificationService";
+} from "../../services/EmailVerificationService.js";
 
 const postSendVerificationEmail = async (req, res, next) => {
     `This API is hit when 
@@ -12,9 +12,9 @@ const postSendVerificationEmail = async (req, res, next) => {
     `
     try {
         const {userId, email} = req.currUser || {};
-        const {link} = await sendVerificationEmail(userId, email);
+        const {link, token} = await sendVerificationEmail(userId, email);
 
-        return res.status(200).json({message: "Successfully sent verification email", link});
+        return res.status(200).json({message: "Successfully sent verification email", link, token});
 
     } catch(error) {
         next(error);

@@ -1,8 +1,8 @@
 import express from 'express';
 
-import authenticateIdentity from '../../middlewares/AuthMiddleware';
+import authenticateIdentity from '../../middlewares/AuthMiddleware.js';
 
-import { postSendVerificationEmail, getVerifyEmail } from '../controllers/EmailController';
+import { postSendVerificationEmail, getVerifyEmail } from '../controllers/EmailController.js';
 
 const EmailRouter = express.Router();
 

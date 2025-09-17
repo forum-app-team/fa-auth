@@ -120,10 +120,10 @@ A authentication microservice built with Node.js and Express. It handles user re
 
 #### Email Verification Service
 
-| Method | Endpoint             | Possible Errors                                                                                                  |
-| ------ | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/auth/verify-email`      | `400 No verification token provided`, `401 Invalid or expired token`, `401 Token already used`, `409 Stale token`, `404 User not found`, `409 Email already verified`, `500 Unexpected error when saving data` |
-| POST   | `/api/auth/verify-email` | `400 User ID and Email required`                                                                              |
+| Method | Endpoint                 | Possible Errors                                                                                                  |
+| ------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/auth/verify-email` | `400 No verification token provided`, `401 Invalid or expired token`, `401 Token already used`, `409 Stale token`, `404 User not found`, `409 Email already verified`, `500 Unexpected error when saving data` |
+| POST   | `/api/auth/verify-email` | `400 User ID and Email required`, `409 Email already verified`                                                   |
 
 
 ## Model & JWT Payload
