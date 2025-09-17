@@ -62,62 +62,7 @@ A authentication microservice built with Node.js and Express. It handles user re
 + Include your credentials in `.env`
 
 ### Database Migration
-
-**IMPORTANT** All commands should be executed at `src`:
-```bash
-$ pwd        # it should be `~/path/to/fa-auth`
-$ cd src
-```
-
-#### Initialization
-If you pulled this repository from remote, in most cases you do *not* need to run the following command that initializes the migration:
-
-```bash
-$ npx sequelize-cli init
-```
-
-#### Apply all current migrations
-This is where you get started after pulling the repository:
-```bash
-$ npx sequelize-cli db:migrate --config config/config.js
-```
-
-And you should be good to go.
-
-#### Apply Changes on the Schema from Remote
-
-+ [Optional] Check `src/migrations` for a new migration file with `.cjs` extension.
-+ Run the previous command:
-```bash
-$ npx sequelize-cli db:migrate --config config/config.js
-```
-
-#### Apply Changes on the Schema Locally
-+ Create a new migration 
-```bash
-$ npx sequelize-cli migration:generate --name your-migration-name
-```
-
-+ Edit the migration file `src/migrations/<timestamp>-your-migration-name.js` to 
-reflect the changes on the schema. Change the file extension from `.js` to `.cjs`.
-
-+ Apply the changes:
-
-```bash
-$ npx sequelize-cli db:migrate --config config/config.js
-```
-
-
-#### Undo
-+ Undo the most recent migration:
-```bash
-$ npx sequelize-cli db:migrate:undo --config config/config.js
-```
-
-+ Undo all migrations:
-```bash
-$ npx sequelize-cli db:migrate:undo:all --config config/config.js
-```      
+This is no longer necessary. The schemas will be synced when starting the service.
 
 ## Scripts
 + To run the service with dev mode:
