@@ -11,7 +11,7 @@ const RABBITMQ_EMAIL_EXCHANGE = process.env.RABBITMQ_EMAIL_EXCHANGE;
 const RABBITMQ_EMAIL_EXCHANGE_TYPE = process.env.RABBITMQ_EMAIL_EXCHANGE_TYPE;
 const RABBITMQ_EMAIL_ROUTING_KEY = process.env.RABBITMQ_EMAIL_ROUTING_KEY;
 
-const BASE_URL = process.env.FE_BASE_URL;
+const BASE_URL = process.env.BASE_URL;
 
 const sendVerificationEmail = async (userId, email) => {
     if (!userId || !email) {

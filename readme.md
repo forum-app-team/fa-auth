@@ -3,8 +3,8 @@
 A authentication microservice built with Node.js and Express. It handles user registration, login, and JWT-based session management.
 
 ## Latest Update
-+ To start the Rabbit MQ Message Consumer for Failed user creations, run `npm run worker`
-+ Still need to add the consumer for email verification
++ Implemented Email Verification
++ Still need test it.
 
 ## Features
 ### Authentication
@@ -42,6 +42,11 @@ A authentication microservice built with Node.js and Express. It handles user re
 + Validate the email verification link
 
   Extract the token from the request query parameters, if it's valid, mark it as used, and update the user identity accordingly.
+
+  **Here is the verification link**: `{BASE_URL}/verify-email?token=${token}`
+
+  For local development, `BASE_URL` is set to `http://localhost:8080`. See `.env.example`.
+
 
 ## API Endpoints
 ### List of Endpoints
@@ -119,52 +124,6 @@ A authentication microservice built with Node.js and Express. It handles user re
 | ------ | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | GET    | `/api/auth/verify-email`      | `400 No verification token provided`, `401 Invalid or expired token`, `401 Token already used`, `409 Stale token`, `404 User not found`, `409 Email already verified`, `500 Unexpected error when saving data` |
 | POST   | `/api/auth/verify-email` | `400 User ID and Email required`                                                                              |
-
-
-<!-- ### Fetching from the Front End
-The access token is now stored **in the Authorization header** instead of the cookies. You can obtain an access token from the `/login` endpoint or the newly added `/refresh` endpoint. Below are some minimal examples of fetching the protected endpoints from the front end:
-
-+ Using `fetch`
-```js
-// Assuming you have a valid accessToken stored
-const accessToken = "YOUR_ACCESS_TOKEN";
-const body = {
-  "email": "user@example.com",
-  "password": "password123"
-}
-
-fetch("http://localhost:3000/api/test_protected", {
-  method: "POST",
-  headers: {
-    "Authorization": `Bearer ${accessToken}`,
-    "Content-Type": "application/json"
-  },
-  credentials: "include" // to include refresh tokens
-
-  body: JSON.stringify(body) // if applicable
-})
-  .then(res => res.json())
-  .then(data => console.log(data))
-  .catch(err => console.error(err));
-```
-
-+ Using `axios`
-```js
-import axios from 'axios';
-
-axios.post("http://localhost:3000/api/test_protected", 
-  body, // if applicable
-  {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
-    },
-    withCredentials: true // to include refresh tokens
-  }
-)
-  .then(res => console.log(res.data))
-  .catch(err => console.error(err));
-``` -->
 
 
 ## Model & JWT Payload
