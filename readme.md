@@ -122,7 +122,7 @@ A authentication microservice built with Node.js and Express. It handles user re
 
 | Method | Endpoint                        | Possible Errors                                                                                                  |
 | ------ | ------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| POST   | `/api/auth/verify-email/verify` | `400 No verification token provided`, `401 Invalid or expired token`, `404 User not found`, `409 Stale token`, `500 Unexpected error when saving data` |
+| POST   | `/api/auth/verify-email/verify` | `400 No verification token provided`, `401 Invalid or expired token`, `401 Token already used`,`404 User not found`, `409 Stale token`, `500 Unexpected error when saving data` |
 | POST   | `/api/auth/verify-email/send`   | `400 User ID and Email required`, `500 Unexpected error during token creation`                                   |
 
 
