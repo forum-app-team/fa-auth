@@ -119,6 +119,25 @@ $ npx sequelize-cli db:migrate:undo --config config/config.js
 $ npx sequelize-cli db:migrate:undo:all --config config/config.js
 ```      
 
+## Scripts
++ To run the service with dev mode:
+```bash
+$ npm run dev
+```
+
++ To run the worker that listens to failed user profile creation:
+```bash
+$ npm run worker
+```
+You may deem this worker as optional since user profile creation is relatively
+not error-prone.
+
++ Cleanup email verification tokens
+```bash
+$ npm run cleanup            # Clean up expired tokens
+$ npm run cleanup:force      # Clean up all tokens
+```
+See [Email Verification Token](#email-verification-token) for more details.
 
 ## API Endpoints
 ### List of Endpoints
