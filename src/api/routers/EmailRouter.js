@@ -2,13 +2,13 @@ import express from 'express';
 
 import authenticateIdentity from '../../middlewares/AuthMiddleware.js';
 
-import { postSendVerificationEmail, getVerifyEmail } from '../controllers/EmailController.js';
+import { postSendVerificationEmail, postValidateEmailByLink } from '../controllers/EmailController.js';
 
 const EmailRouter = express.Router();
 
 EmailRouter
-    .post("/verify-email", authenticateIdentity, postSendVerificationEmail)
-    .get('/verify-email', getVerifyEmail)
+    .post("/send", authenticateIdentity, postSendVerificationEmail)
+    .post('/verify', postValidateEmailByLink)
 ;
 
 export default EmailRouter;

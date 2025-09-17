@@ -39,6 +39,6 @@ AuthRouter
     // .post("/test_protected", authenticateIdentity, postTestProtectedPage)
 ;
 AuthRouter.use('/admin', AdminRouter);
-AuthRouter.use(EmailRouter);
+AuthRouter.use('/verify-email', EmailRouter);
 
 export default AuthRouter;

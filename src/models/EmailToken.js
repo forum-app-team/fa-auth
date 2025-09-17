@@ -15,6 +15,11 @@ const EmailToken = sequelize.define("EmailToken", {
         allowNull: false,
         unique: false, // a user may require multiple tokens
     },
+    to: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
     token: {
         type: DataTypes.STRING,
         allowNull: false,

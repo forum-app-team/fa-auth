@@ -21,13 +21,13 @@ const postSendVerificationEmail = async (req, res, next) => {
     }
 };
 
-const getVerifyEmail = async (req, res, next) => {
+const postValidateEmailByLink = async (req, res, next) => {
     `Apparently, this API should not require login.
     Incoming request format:
         '/api/auth/verify-email?token=<token>'
     `
     try {
-        const tokenString = req.query.token || "";
+        const tokenString = req.body.token || "";
         const {email} = await validateVerificationEmail(tokenString);
         return res.status(200).json({message: "Successfully verified email address", email});
 
@@ -36,4 +36,4 @@ const getVerifyEmail = async (req, res, next) => {
     }
 };
 
-export {postSendVerificationEmail, getVerifyEmail};
+export {postSendVerificationEmail, postValidateEmailByLink};

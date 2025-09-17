@@ -3,8 +3,8 @@
 A authentication microservice built with Node.js and Express. It handles user registration, login, and JWT-based session management.
 
 ## Latest Update
-+ Implemented Email Verification
-+ Still need test it.
++ Integrated Email Verification with front end;
++ The verification tokens are now **idempotent**. That being said, no `409` errors will be raised if an email address has already been verified.
 
 ## Features
 ### Authentication
@@ -70,10 +70,10 @@ A authentication microservice built with Node.js and Express. It handles user re
 
 #### Email Verification Service:
 
-| Method | Endpoint                  | Description                            | Auth Required | Body Parameters                                           |
-| ------ | ------------------------- | -------------------------------------- | ------------- | --------------------------------------------------------- |
-| GET    | `/api/auth/verify-email`  | Validate the email verification token  | No            | `token` (query parameter: `?token=<token>`)               |
-| POST   | `/api/auth/verify-email`  | Send email verification link           | YES           |  None                                                     |
+| Method | Endpoint                         | Description                            | Auth Required | Body Parameters                                           |
+| ------ | -------------------------------- | -------------------------------------- | ------------- | --------------------------------------------------------- |
+| POST   | `/api/auth/verify-email/verify`  | Validate the email verification token  | No            | `token`                                                   |
+| POST   | `/api/auth/verify-email/send`    | Send email verification link           | YES           |  None                                                     |
 
 * At least one of `newPassword`, `newEmail` should be provided when calling `PUT /api/auth/identity`
 
@@ -97,10 +97,10 @@ A authentication microservice built with Node.js and Express. It handles user re
 
 #### Email Verification Service
 
-| Method | Endpoint                 | Success Status | Response Body                                                                               |
-| ------ | ------------------------ | -------------- | ------------------------------------------------------------------------------------------- |
-| GET    | `/api/auth/verify-email` | 200            | `{message: "Successfully verified email address", email: <email address>`                   |
-| POST   | `/api/auth/verify-email` | 200            | `{message: "Successfully sent verification email", link: <verification link>}`              |
+| Method | Endpoint                        | Success Status | Response Body                                                                               |
+| ------ | ------------------------------- | -------------- | ------------------------------------------------------------------------------------------- |
+| POST   | `/api/auth/verify-email/verify` | 200            | `{message: "Successfully verified email address", email: <email address>`                   |
+| POST   | `/api/auth/verify-email/send`   | 200            | `{message: "Successfully sent verification email", link: <verification link>}`              |
 
 
 ### Error Responses
@@ -120,10 +120,10 @@ A authentication microservice built with Node.js and Express. It handles user re
 
 #### Email Verification Service
 
-| Method | Endpoint                 | Possible Errors                                                                                                  |
-| ------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/auth/verify-email` | `400 No verification token provided`, `401 Invalid or expired token`, `401 Token already used`, `409 Stale token`, `404 User not found`, `409 Email already verified`, `500 Unexpected error when saving data` |
-| POST   | `/api/auth/verify-email` | `400 User ID and Email required`, `409 Email already verified`                                                   |
+| Method | Endpoint                        | Possible Errors                                                                                                  |
+| ------ | ------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| POST   | `/api/auth/verify-email/verify` | `400 No verification token provided`, `401 Invalid or expired token`, `404 User not found`, `409 Stale token`, `500 Unexpected error when saving data` |
+| POST   | `/api/auth/verify-email/send`   | `400 User ID and Email required`, `500 Unexpected error during token creation`                                   |
 
 
 ## Model & JWT Payload
@@ -142,15 +142,16 @@ The `Identity` model represents a user’s authentication and identity informati
 ### Email Verification Token
 The `EmailToken` model represents one-time email verification tokens. 
 
-| Field       | Type    | Required | Default                            | Description                                                                 |
-| ----------- | ------- | -------- | ---------------------------------- | --------------------------------------------------------------------------- |
-| `id`        | UUID    | Yes      | UUIDV4                             | Primary key for each email token record.                                    |
-| `userId`    | UUID    | Yes      | —                                  | ID of the user this token belongs to. Multiple tokens per user are allowed. |
-| `token`     | STRING  | Yes      | —                                  | Unique verification token string.                                           |
-| `used`      | BOOLEAN | Yes      | `false`                            | Indicates whether the token has been used.                                  |
-| `createdAt` | DATE    | Yes      | `Now`                              | Timestamp when the token was created.                                       |
-| `expiresAt` | DATE    | Yes      | `Now + EMAIL_TOKEN_EXPIRE`         | Expiration timestamp for the token.                                         |
-| `usedAt`    | DATE    | No       | —                                  | Timestamp when the token was marked as used.                                |
+| Field       | Type    | Required | Default                            | Description                                                                       |
+| ----------- | ------- | -------- | ---------------------------------- | --------------------------------------------------------------------------------- |
+| `id`        | UUID    | Yes      | UUIDV4                             | Primary key for each email token record.                                          |
+| `userId`    | UUID    | Yes      | —                                  | ID of the user this token belongs to. Multiple tokens per user are allowed.       |
+| `to`        | STRING  | Yes      | —                                  | Email address to which this token is sent. Multiple tokens per email are allowed. |
+| `token`     | STRING  | Yes      | —                                  | Unique verification token string.                                                 |
+| `used`      | BOOLEAN | Yes      | `false`                            | Indicates whether the token has been used.                                        |
+| `createdAt` | DATE    | Yes      | `Now`                              | Timestamp when the token was created.                                             |
+| `expiresAt` | DATE    | Yes      | `Now + EMAIL_TOKEN_EXPIRE`         | Expiration timestamp for the token.                                               |
+| `usedAt`    | DATE    | No       | —                                  | Timestamp when the token was marked as used.                                      |
 
 **IMPORTANT NOTE**
 + `EMAIL_TOKEN_EXPIRE` is located at `.env`.
@@ -243,9 +244,29 @@ fa-auth/
 + Create a `.env` file locally: `$ cp .env.example .env`
 
 ### Database Migration
-To initialize the database for local development and testing, follow the following steps:
++ To initialize the database for local development and testing, follow the following steps:
 ```bash
 $ cd src
-$ npx sequelize-cli init
+$ npx sequelize-cli init # Only run at initialization
+```
++ After initialization or any changes, run the following code:
+```bash
+$ npx sequelize-cli migration:generate --name your-migration-name
 $ npx sequelize-cli db:migrate --config config/config.js
 ```
+
+
++ To undo the most recent or all migrations, run
+```bash
+$ npx sequelize-cli db:migrate:undo --config config/config.js
+$ npx sequelize-cli db:migrate:undo:all --config config/config.js
+```      
+
+** Important Note **
+If you see 
+```
+ERROR: module is not defined in ES module scope
+This file is being treated as an ES module because it has a '.js' file extension and 'fa-auth/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+```
+
+just follow the instructions.

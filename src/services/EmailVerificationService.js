@@ -20,9 +20,9 @@ const sendVerificationEmail = async (userId, email) => {
 
     const identity = await Identity.findByPk(userId);
 
-    if (identity.emailVerified) {
-        throw new AuthError("Email already verified", 409);
-    }
+    // if (identity.emailVerified) {
+    //     throw new AuthError("Email already verified", 409);
+    // }
     // connect to Rabbit MQ
     const conn = await amqp.connect(RABBITMQ_URL);
     const ch = await conn.createChannel();
@@ -54,7 +54,11 @@ const sendVerificationEmail = async (userId, email) => {
         tokenAlreadyExists = await EmailToken.findOne({where: {token}});
     } while (tokenAlreadyExists);
 
-    await EmailToken.create({userId, token});
+    try {
+        await EmailToken.create({userId, token, to: email});
+    } catch(error) {
+        throw new AuthError("Unexpected error during token creation", 500)
+    }
 
     const link = `${BASE_URL}/verify-email?token=${token}`;
 
@@ -64,7 +68,7 @@ const sendVerificationEmail = async (userId, email) => {
         html: `
             <div>
                 <p>Please click the link below to complete email verification. The link expires in 30 minutes.</p>
-                <a href=${link}>Verify Email</a>
+                <a href=${link}>${link}</a>
             </div>
             `
     };
@@ -118,13 +122,17 @@ const validateVerificationEmail = async (tokenString) => {
         throw new AuthError("User not found", 404);
     }
 
-    if (identity.emailVerified) {
-        throw new AuthError("Email already verified", 409);
-    }
+    // if (identity.emailVerified) {
+    //     throw new AuthError("Email already verified", 409);
+    // }
 
     try {
         // set identity.emailVerified to true
-        await identity.update({emailVerified: true});
+        // set new email only after verification
+        await identity.update({
+            email: token.to, 
+            emailVerified: true
+        });
 
         // mark token as used
         await token.update({used: true, usedAt: new Date()});

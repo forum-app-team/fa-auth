@@ -108,9 +108,9 @@ const updateUserIdentity = async (userId, currentPassword, newPassword, newEmail
         }
 
         // set new email address
-        identity.email = newEmail;
+        // identity.email = newEmail;
         // mark `identity.emailVerified` as false
-        identity.emailVerified = false;
+        // identity.emailVerified = false;
     }
 
     try {
